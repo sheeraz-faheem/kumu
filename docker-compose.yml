@@ -1,4 +1,6 @@
 version: '3.8'
+networks:
+    kumu_network:
 services: 
     main:
         container_name: kumu_test
@@ -9,6 +11,8 @@ services:
             - ./code:/var/www/html/
         ports:
             - 8000:8000
+        networks:
+            - kumu_network
     db:
         container_name: kumu_mysql
         image: mysql
@@ -20,6 +24,8 @@ services:
             - '3306:3306'
         expose:
             - '3306'
+        networks:
+            - kumu_network
     redis:
         container_name: kumu_redis
         image: redis
@@ -28,4 +34,6 @@ services:
             - '6379:6379'
         expose:
             - '6379'
+        networks:
+            - kumu_network
     
