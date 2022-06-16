@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\GithubController;
+use App\Http\Controllers\HammingDistanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,4 +29,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->controller(GithubController::class)->prefix('github')->group(function() {
     Route::get('/users', 'getUsers');
+});
+
+Route::middleware('auth:sanctum')->controller(HammingDistanceController::class)->prefix('hd')->group(function() {
+    Route::get('/', 'hammingDistance');
 });
