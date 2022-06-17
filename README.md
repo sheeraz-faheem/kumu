@@ -1,3 +1,4 @@
+Requirement: Docker Desktop
 ## INSTRUCTIONS
 1. Run `docker-compose up -d`
 2. Run `docker ps`, copy CONTAINER ID
