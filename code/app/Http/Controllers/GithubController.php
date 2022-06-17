@@ -15,14 +15,23 @@ class GithubController extends BaseController
      */
     public function getUsers(Request $request): JsonResponse
     {
-        $requestQuery = $request->query();
-        data_set($requestQuery, 'per_page', 10);
+        try {
+            $requestQuery = $request->query();
+            data_set($requestQuery, 'per_page', 10);
         
-        $users = resolve(GithubClient::class)->users($requestQuery);
+            $users = resolve(GithubClient::class)->users($requestQuery);
 
-        return Cache::remember('github-users', 120, function () use ($users) {
-            return self::getUserData($users);
-        });
+            return Cache::remember('github-users', 120, function () use ($users) {
+                return self::getUserData($users);
+            });
+
+        } catch (\Exception $error) {
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $error->getMessage()
+            ]);
+        }
+        
     }
 
     /**
