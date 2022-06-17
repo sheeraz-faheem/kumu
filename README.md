@@ -8,3 +8,31 @@ Requirement: Docker Desktop
 6. Run `php artisan serve --host=0.0.0.0`
 
 Navigate to `http://localhost:8000`
+
+## Optional
+Add Github Personal Access Token on .env if request limit is reached.
+GITHUB_PAT=token
+
+
+## API Routes
+via POSTMAN Collection: https://www.getpostman.com/collections/ebec70c6d27c27b76450
+
+    POST /api/register
+
+    {
+        "name": "Sheeraz Faheem",
+        "email": "sfm@yopmail.com",
+        "password": "123qwe",
+        "c_password": "123qwe"
+    }
+
+    POST /api/login
+
+    {
+        "email": "srfaheem07@gmail.com",
+        "password": "123qwe"
+    }
+
+    GET /api/user
+    GET /api/github/users
+    GET /api/hd?a=1&b=4
