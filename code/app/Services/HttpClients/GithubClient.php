@@ -3,8 +3,6 @@
 namespace App\Services\HttpClients;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 
 class GithubClient extends AbstractClient
 {
@@ -13,14 +11,9 @@ class GithubClient extends AbstractClient
      */
     public function users(array $query = []): JsonResponse
     {
-        $key = Str::random(16);
-
-        return Cache::remember($key, 120, function () use ($query) {
-            return $this->request('GET', '/users', [
-                'query' => $query,
-            ]);
-        });
-
+        return $this->request('GET', '/users', [
+            'query' => $query,
+        ]);
     }
 
     /**
@@ -28,10 +21,6 @@ class GithubClient extends AbstractClient
      */
     public function user(string $username): JsonResponse
     {
-        $key = Str::random(16);
-
-        return Cache::remember($key, 120, function () use ($username) {
-            return $this->request('GET', "/users/$username");
-        });
+        return $this->request('GET', "/users/$username");
     }
 }

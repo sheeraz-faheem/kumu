@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController as BaseController;
 use App\Services\HttpClients\GithubClient;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\JsonResponse;
 
 class GithubController extends BaseController
@@ -12,20 +13,22 @@ class GithubController extends BaseController
     /**
      * Get user list
      */
-    public function getUsers(Request $request)
+    public function getUsers(Request $request): JsonResponse
     {
         $requestQuery = $request->query();
         data_set($requestQuery, 'per_page', 10);
         
         $users = resolve(GithubClient::class)->users($requestQuery);
 
-        return self::getUserData($users);
+        return Cache::remember('github-users', 120, function () use ($users) {
+            return self::getUserData($users);
+        });
     }
 
     /**
      * Get user data
      */
-    private function getUserData($users)
+    private function getUserData($users): JsonResponse
     {
         $users = $users->getData();
 

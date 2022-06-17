@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
         $headers = [
             'X-Requested-With' => 'XMLHttpRequest',
             'Content-Type' => 'application/json',
-            'Authorization' => 'token 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',
+            'Authorization' => 'token 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',
         ];
 
         $this->app->singleton(GithubClient::class, function () use ($headers) {
