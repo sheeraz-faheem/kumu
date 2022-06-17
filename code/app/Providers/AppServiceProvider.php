@@ -25,10 +25,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (env('GITHUB_PAT')) {
+            $headers['Authorization'] = 'token '.env('GITHUB_PAT');    
+        }
+
         $headers = [
             'X-Requested-With' => 'XMLHttpRequest',
             'Content-Type' => 'application/json',
-            'Authorization' => 'token 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',
         ];
 
         $this->app->singleton(GithubClient::class, function () use ($headers) {
