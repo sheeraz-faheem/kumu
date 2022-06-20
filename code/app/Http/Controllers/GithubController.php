@@ -19,11 +19,24 @@ class GithubController extends BaseController
             $requestQuery = $request->query();
             data_set($requestQuery, 'per_page', 10);
         
+            if ($request->exists('since')) {
+                data_set($requestQuery, 'since', (int) $request->since);
+            }
+
             $users = resolve(GithubClient::class)->users($requestQuery);
 
-            return Cache::remember('github-users', 120, function () use ($users) {
-                return self::getUserData($users);
-            });
+            $users = $users->getData();
+            $githubUsers = [];
+
+            foreach ($users as $k => $user) {
+                $githubUsers[$k] = Cache::remember($user->login, 120, function () use ($user) {
+                    return self::getUserData($user);
+                });
+            }
+
+            $githubUsers = collect($githubUsers)->sortBy('id');        
+            
+            return response()->json($githubUsers);
 
         } catch (\Exception $error) {
             return response()->json([
@@ -37,34 +50,24 @@ class GithubController extends BaseController
     /**
      * Get user data
      */
-    private function getUserData($users): JsonResponse
+    private function getUserData($user)
     {
-        $users = $users->getData();
+        $userData = resolve(GithubClient::class)->user($user->login);
+        $data = $userData->getData();
 
-        $githubUsers = [];
+        if ($userData->status() !== 404) {
 
-        foreach ($users as $k => $user) {
-            $userData = resolve(GithubClient::class)->user($user->login);
-            $data = $userData->getData();
+            $averageRepoFollowers = $data->public_repos !== 0 ? 
+                number_format($data->followers/$data->public_repos, 2) : "0.00";
 
-            if ($userData->status() !== 404) {
-
-                $averageRepoFollowers = $data->public_repos !== 0 ? 
-                    number_format($data->followers/$data->public_repos, 2) : "0.00";
-
-                $githubUsers[$k] = [
-                    'name' => $data->name,
-                    'login' => $data->login,
-                    'company' => $data->company,
-                    'followers' => $data->followers,
-                    'public_repos' => $data->public_repos,
-                    'average_repo_followers' => $averageRepoFollowers,
-                ];
-            }
+            return [
+                'name' => $data->name,
+                'login' => $data->login,
+                'company' => $data->company,
+                'followers' => $data->followers,
+                'public_repos' => $data->public_repos,
+                'average_repo_followers' => $averageRepoFollowers,
+            ];
         }
-
-        $githubUsers = collect($githubUsers)->sortBy('name');
-        
-        return response()->json($githubUsers);
     }
 }
